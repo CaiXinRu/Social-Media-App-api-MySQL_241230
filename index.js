@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import multer from "multer";
 import authRoutes from "./routes/auth.js";
 import commentRoutes from "./routes/comments.js";
 import likeRoutes from "./routes/likes.js";
@@ -22,6 +23,22 @@ app.use(
   }),
 );
 app.use(cookieParser());
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "../Social-Media-App-Design_241216/public/upload");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  const file = req.file;
+  res.status(200).json(file.filename);
+});
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
